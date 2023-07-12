@@ -1,0 +1,95 @@
+[build-system]
+requires = ["hatchling", "hatch-vcs"]
+build-backend = "hatchling.build"
+
+[project]
+name = "fids"
+description = "fake bids dataset generator"
+long_description = { file = "README.md" }
+authors = [{ name = "Remi Gau" }]
+maintainers = [{ name = "Remi Gau", email = "remi.gau@gmail.com" }]
+readme = "README.md"
+license = { text = "new BSD" }
+requires-python = ">=3.8"
+dependencies = [
+  "nibabel",
+	"numpy",
+	"pandas",
+	"scipy",
+	"pybids",
+]
+classifiers = [
+  "Intended Audience :: Science/Research",
+  "Intended Audience :: Developers",
+  "License :: OSI Approved",
+  "Programming Language :: C",
+  "Programming Language :: Python",
+  "Topic :: Software Development",
+  "Topic :: Scientific/Engineering",
+  "Operating System :: Microsoft :: Windows",
+  "Operating System :: POSIX",
+  "Operating System :: Unix",
+  "Operating System :: MacOS",
+  "Programming Language :: Python :: 3.8",
+  "Programming Language :: Python :: 3.9",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
+]
+# Version from setuptools_scm
+dynamic = ["version"]
+
+[project.optional-dependencies]
+# Requirements necessary for building the documentation
+doc = [
+	"coverage",
+	"flake8",
+	"flake8-docstrings",
+	"furo",
+	"myst-parser",
+	"numpydoc",
+  "ruamel.yaml",
+	"sphinx",
+	"sphinx-copybutton",
+]
+# For running unit and docstring tests
+test = [
+	"coverage",
+	"pytest",
+	"pytest-cov",
+]
+# A combination of dependencies useful for developers
+dev = [
+	"fids[doc,test]",
+	"isort",
+	"flynt",
+	"black",
+  "flake8-use-fstring",
+]
+
+[tool.hatch.build.targets.wheel]
+packages = ["fids"]
+
+[tool.hatch.version]
+source = "vcs"
+
+[tool.hatch.build.hooks.vcs]
+version-file = "fids/_version.py"
+
+[tool.black]
+line-length = 99
+
+[tool.isort]
+profile = "black"
+src_paths = [
+  'fids',
+]
+line_length = 99
+skip_gitignore = true
+combine_as_imports = true
+
+[tool.pytest.ini_options]
+minversion = "6.0"
+addopts = "-s -vv"
+
+[tool.codespell]
+skip = "./.git,p,.mypy_cache,env,venv,./doc/_build"

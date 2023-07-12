@@ -1,0 +1,40 @@
+
+sourcedata
+
+.mypy_cache
+
+# ignore python type annotation stubs for now
+*.pyi
+
+pip-log.txt
+
+.pytest_cache
+
+.ropeproject/
+
+tags
+
+tmp
+
+# Mac OS X
+.DS_Store
+
+# IDE related
+.idea/
+.vscode/
+
+# build related
+nilearn.egg-info/
+build
+dist/
+nilearn/_version.py
+
+# virtual environment
+env/
+venv/
+
+# coverage
+.coverage
+coverage
+nosetests_coverage/
+
