@@ -1,27 +1,36 @@
-from future import __annotations__
-from bids import BIDSLayout
-from pathlib import Path
+"""FIDS main module."""
 import json
+from pathlib import Path
+
+from bids import BIDSLayout
+from future import __annotations__  # noqa
 
 DEFAUTL_NIFTI_EXT = ".nii.gz"
 
+
 def dataset_description(dataset_type):
+    """Return a dataset_description."""
     return {
         "BIDSVersion": "1.8.0",
         "Name": dataset_type,
         "dataset_type": dataset_type,
     }
 
+
 def write_readme(output_dir: Path):
+    """Write a README.md file."""
     with open(output_dir / "README.md", "w") as f:
         f.write("This is a fake BIDS dataset")
 
+
 def bids_fitler_file():
+    """Return a dictionary of suffixes for each datatype."""
     return {
-    "fmap": {},
-    "func": {"suffix": ["bold", "events"]},
-    "anat": {"suffix": ["T1w"]},
+        "fmap": {},
+        "func": {"suffix": ["bold", "events"]},
+        "anat": {"suffix": ["T1w"]},
     }
+
 
 def fids(
     output_dir: Path = Path.cwd() / "sourcedata" / "fids",
@@ -31,6 +40,7 @@ def fids(
     datatypes: str | list[str] = ["anat", "func"],
     tasks: str | list[str] = ["rest"],
 ):
+    """Create a fake BIDS dataset."""
     if isinstance(subjects, str):
         subjects = [subjects]
 
@@ -59,8 +69,8 @@ def fids(
                     if suffix_ == "events":
                         entities["extension"] = ".tsv"
                     if datatype_ == "anat":
-                            create_empty_file(layout=layout, entities=entities)
-                            create_sidecar(layout=layout, entities=entities)
+                        create_empty_file(layout=layout, entities=entities)
+                        create_sidecar(layout=layout, entities=entities)
                     if datatype_ == "func":
                         for task_ in tasks:
                             entities["task"] = task_
@@ -69,6 +79,7 @@ def fids(
 
 
 def create_empty_file(layout: BIDSLayout, entities: dict[str, str]):
+    """Create an empty file."""
     filepath = layout.build_path(
         source=entities,
         validate=False,
@@ -81,6 +92,7 @@ def create_empty_file(layout: BIDSLayout, entities: dict[str, str]):
 def create_sidecar(
     layout: BIDSLayout, entities: dict[str, str], metadata: dict[str, str] = None
 ):
+    """Create a sidecar JSON file."""
     entities["extension"] = ".json"
     filepath = layout.build_path(
         source=entities,

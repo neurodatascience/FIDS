@@ -76,14 +76,14 @@ source = "vcs"
 version-file = "fids/_version.py"
 
 [tool.black]
-line-length = 99
+line-length = 89
 
 [tool.isort]
 profile = "black"
 src_paths = [
   'fids',
 ]
-line_length = 99
+line_length = 89
 skip_gitignore = true
 combine_as_imports = true
 
