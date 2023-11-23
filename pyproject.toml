@@ -1,70 +1,69 @@
 [build-system]
-requires = ["hatchling", "hatch-vcs"]
 build-backend = "hatchling.build"
+requires = ["hatchling", "hatch-vcs"]
 
 [project]
-name = "fids"
-description = "fake bids dataset generator"
-long_description = { file = "README.md" }
-authors = [{ name = "Remi Gau" }]
-maintainers = [{ name = "Remi Gau", email = "remi.gau@gmail.com" }]
-readme = "README.md"
-license = { text = "new BSD" }
-requires-python = ">=3.8"
-dependencies = [
-  "nibabel",
-	"numpy",
-	"pandas",
-	"scipy",
-	"pybids",
-]
+authors = [{name = "Remi Gau"}]
 classifiers = [
-  "Intended Audience :: Science/Research",
-  "Intended Audience :: Developers",
-  "License :: OSI Approved",
-  "Programming Language :: C",
-  "Programming Language :: Python",
-  "Topic :: Software Development",
-  "Topic :: Scientific/Engineering",
-  "Operating System :: Microsoft :: Windows",
-  "Operating System :: POSIX",
-  "Operating System :: Unix",
-  "Operating System :: MacOS",
-  "Programming Language :: Python :: 3.8",
-  "Programming Language :: Python :: 3.9",
-  "Programming Language :: Python :: 3.10",
-  "Programming Language :: Python :: 3.11",
+    "Intended Audience :: Science/Research",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved",
+    "Programming Language :: C",
+    "Programming Language :: Python",
+    "Topic :: Software Development",
+    "Topic :: Scientific/Engineering",
+    "Operating System :: Microsoft :: Windows",
+    "Operating System :: POSIX",
+    "Operating System :: Unix",
+    "Operating System :: MacOS",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12"
 ]
+dependencies = [
+    "pybids"
+]
+description = "fake bids dataset generator"
 # Version from setuptools_scm
 dynamic = ["version"]
+license = {text = "GNU GPL 3"}
+maintainers = [{name = "Remi Gau", email = "remi.gau@gmail.com"}]
+name = "fids"
+readme = "README.md"
+requires-python = ">=3.8"
 
 [project.optional-dependencies]
+# A combination of dependencies useful for developers
+dev = [
+    "fids[doc,test]",
+    "pre-commit"
+]
 # Requirements necessary for building the documentation
 doc = [
-	"coverage",
-	"flake8",
-	"flake8-docstrings",
-	"furo",
-	"myst-parser",
-	"numpydoc",
-  "ruamel.yaml",
-	"sphinx",
-	"sphinx-copybutton",
+    "furo",
+    "myst-parser",
+    "numpydoc",
+    "ruamel.yaml",
+    "sphinx",
+    "sphinx-copybutton"
 ]
 # For running unit and docstring tests
 test = [
-	"coverage",
-	"pytest",
-	"pytest-cov",
+    "coverage",
+    "pytest",
+    "pytest-cov"
 ]
-# A combination of dependencies useful for developers
-dev = [
-	"fids[doc,test]",
-	"isort",
-	"flynt",
-	"black",
-  "flake8-use-fstring",
-]
+
+[tool.black]
+line-length = 89
+
+[tool.codespell]
+skip = "./.git,p,.mypy_cache,env,venv,./doc/_build"
+
+[tool.hatch.build.hooks.vcs]
+version-file = "fids/_version.py"
 
 [tool.hatch.build.targets.wheel]
 packages = ["fids"]
@@ -72,24 +71,36 @@ packages = ["fids"]
 [tool.hatch.version]
 source = "vcs"
 
-[tool.hatch.build.hooks.vcs]
-version-file = "fids/_version.py"
+[tool.mypy]
+check_untyped_defs = true
+disallow_any_generics = true
+disallow_incomplete_defs = true
+disallow_untyped_defs = true
+enable_error_code = ["ignore-without-code", "redundant-expr"]  # "truthy-bool"
+no_implicit_optional = true
+show_error_codes = true
+# strict = true
+warn_redundant_casts = true
+warn_unreachable = true
+warn_unused_ignores = true
 
-[tool.black]
-line-length = 89
-
-[tool.isort]
-profile = "black"
-src_paths = [
-  'fids',
+[[tool.mypy.overrides]]
+ignore_missing_imports = true
+module = [
+    "bids.*"
 ]
-line_length = 89
-skip_gitignore = true
-combine_as_imports = true
+
+[[tool.mypy.overrides]]
+ignore_errors = true
+module = [
+    'tests.*'
+]
 
 [tool.pytest.ini_options]
-minversion = "6.0"
-addopts = "-s -vv"
-
-[tool.codespell]
-skip = "./.git,p,.mypy_cache,env,venv,./doc/_build"
+addopts = "-ra -q -vv --showlocals --strict-markers --strict-config"
+# filterwarnings = ["error"]
+# log_cli_level = "warning"
+minversion = "6.0.0"
+norecursedirs = "data"
+testpaths = ["tests/"]
+xfail_strict = true

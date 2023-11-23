@@ -1,14 +1,16 @@
 """FIDS main module."""
+from __future__ import annotations
+
 import json
 from pathlib import Path
 
 from bids import BIDSLayout
-from future import __annotations__  # noqa
+
 
 DEFAUTL_NIFTI_EXT = ".nii.gz"
 
 
-def dataset_description(dataset_type):
+def dataset_description(dataset_type: str) -> dict[str, str]:
     """Return a dataset_description."""
     return {
         "BIDSVersion": "1.8.0",
@@ -17,13 +19,13 @@ def dataset_description(dataset_type):
     }
 
 
-def write_readme(output_dir: Path):
+def write_readme(output_dir: Path) -> None:
     """Write a README.md file."""
     with open(output_dir / "README.md", "w") as f:
         f.write("This is a fake BIDS dataset")
 
 
-def bids_fitler_file():
+def bids_fitler_file() -> dict[str, dict[str, list[str]]]:
     """Return a dictionary of suffixes for each datatype."""
     return {
         "fmap": {},
@@ -32,22 +34,29 @@ def bids_fitler_file():
     }
 
 
-def fids(
+def create_fake_bids_dataset(
     output_dir: Path = Path.cwd() / "sourcedata" / "fids",
     dataset_type: str = "raw",
-    subjects: str | int = "01",
-    sessions: None | str | int = "01",
+    subjects: str | int | list[str | int] = "01",
+    sessions: None | str | int | list[str | int | None] = "01",
     datatypes: str | list[str] = ["anat", "func"],
     tasks: str | list[str] = ["rest"],
-):
+) -> None:
     """Create a fake BIDS dataset."""
-    if isinstance(subjects, str):
-        subjects = [subjects]
+    if isinstance(subjects, (str, int)):
+        subjects_to_create = [subjects]
+    else:
+        subjects_to_create = subjects
 
-    if isinstance(sessions, str):
-        sessions = [sessions]
     if sessions is None:
-        sessions = [None]
+        sessions_to_create = [None]
+    elif isinstance(sessions, (str, int)):
+        sessions_to_create = [sessions]
+    else:
+        sessions_to_create = sessions
+
+    if isinstance(datatypes, (str)):
+        datatypes = [datatypes]
 
     Path.mkdir(output_dir, parents=True, exist_ok=True)
 
@@ -56,9 +65,9 @@ def fids(
 
     layout = BIDSLayout(output_dir, validate=False)
 
-    for sub_label in subjects:
+    for sub_label in subjects_to_create:
         entities = {"subject": sub_label}
-        for ses_label in sessions:
+        for ses_label in sessions_to_create:
             if ses_label:
                 entities["session"] = ses_label
             for datatype_ in datatypes:
@@ -78,7 +87,7 @@ def fids(
                             create_sidecar(layout=layout, entities=entities)
 
 
-def create_empty_file(layout: BIDSLayout, entities: dict[str, str]):
+def create_empty_file(layout: BIDSLayout, entities: dict[str, str | int]) -> None:
     """Create an empty file."""
     filepath = layout.build_path(
         source=entities,
@@ -90,8 +99,10 @@ def create_empty_file(layout: BIDSLayout, entities: dict[str, str]):
 
 
 def create_sidecar(
-    layout: BIDSLayout, entities: dict[str, str], metadata: dict[str, str] = None
-):
+    layout: BIDSLayout,
+    entities: dict[str, str | int],
+    metadata: None | dict[str, str] = None,
+) -> None:
     """Create a sidecar JSON file."""
     entities["extension"] = ".json"
     filepath = layout.build_path(
@@ -105,4 +116,4 @@ def create_sidecar(
 
 
 if __name__ == "__main__":
-    fids()
+    create_fake_bids_dataset()
