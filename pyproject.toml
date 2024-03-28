@@ -23,7 +23,9 @@ classifiers = [
     "Programming Language :: Python :: 3.12"
 ]
 dependencies = [
-    "pybids"
+    "pybids",
+    "numpy",
+    "nibabel"
 ]
 description = "fake bids dataset generator"
 # Version from setuptools_scm

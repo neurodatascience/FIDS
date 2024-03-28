@@ -4,7 +4,10 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
+import nibabel as nib
+import numpy as np
 from bids import BIDSLayout
+from nibabel import Nifti1Image
 
 
 DEFAUTL_NIFTI_EXT = ".nii.gz"
@@ -30,7 +33,8 @@ def bids_fitler_file() -> dict[str, dict[str, list[str]]]:
     return {
         "fmap": {},
         "func": {"suffix": ["bold", "events"]},
-        "anat": {"suffix": ["T1w"]},
+        "dwi": {"suffix": ["dwi"]},
+        "anat": {"suffix": ["T1w", "T2w"]},
     }
 
 
@@ -95,7 +99,13 @@ def create_empty_file(layout: BIDSLayout, entities: dict[str, str | int]) -> Non
     )
     filepath = Path(filepath)
     filepath.parent.mkdir(parents=True, exist_ok=True)
-    filepath.touch()
+    if entities["extension"] in [".nii", ".nii.gz"]:
+        image = _img_3d_rand_eye()
+        if entities["datatype"] in ["func", "dwi"]:
+            image = _img_4d_rand_eye()
+        nib.save(image, filepath)
+    else:
+        filepath.touch()
 
 
 def create_sidecar(
@@ -113,6 +123,41 @@ def create_sidecar(
         metadata = {}
     with open(filepath, "w") as f:
         json.dump(metadata, f, indent=4)
+
+
+def _rng(seed=42):
+    return np.random.default_rng(seed)
+
+
+def _affine_eye():
+    """Return an identity matrix affine."""
+    return np.eye(4)
+
+
+def _shape_3d_default():
+    """Return default shape for a 3D image."""
+    return (10, 10, 10)
+
+
+def _length_default():
+    return 10
+
+
+def _shape_4d_default():
+    """Return default shape for a 4D image."""
+    return (10, 10, 10, _length_default())
+
+
+def _img_3d_rand_eye(affine=_affine_eye()):
+    """Return random 3D Nifti1Image in MNI space."""
+    data = _rng().random(_shape_3d_default())
+    return Nifti1Image(data, affine)
+
+
+def _img_4d_rand_eye(affine=_affine_eye()):
+    """Return random 3D Nifti1Image in MNI space."""
+    data = _rng().random(_shape_4d_default())
+    return Nifti1Image(data, affine)
 
 
 if __name__ == "__main__":
