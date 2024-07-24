@@ -62,6 +62,7 @@ test = [
 line-length = 89
 
 [tool.codespell]
+ignore-words-list = "nd"
 skip = "./.git,p,.mypy_cache,env,venv,./doc/_build"
 
 [tool.hatch.build.hooks.vcs]
