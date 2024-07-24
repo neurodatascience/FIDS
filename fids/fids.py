@@ -210,28 +210,11 @@ def create_dummy_file(
     filepath = Path(filepath)
     filepath.parent.mkdir(parents=True, exist_ok=True)
 
-    nb_slices = None
-    if metadata and "SliceTiming" in metadata:
-        nb_slices = len(metadata["SliceTiming"])
-
     if entities["extension"] in [".nii", ".nii.gz"]:
-        image = _img_3d_rand_eye(nb_slices=nb_slices)
+        image = _img_3d_rand_eye(nb_slices=_get_nb_slices(metadata))
+
         if entities["datatype"] in ["func", "dwi"]:
-            max_time_secs = 10
-            if events:
-                max_time_secs = max(events["onset"]) + max(events["duration"])
-
-            tr = None
-            nb_vol = None
-            if metadata and "RepetitionTime" in metadata:
-                tr = metadata["RepetitionTime"]
-                nb_vol = int(max_time_secs / tr)
-
-            image = _img_4d_rand_eye(nb_slices=nb_slices, nb_vol=nb_vol)
-
-            if tr:
-                image = set_tr(image, tr)
-
+            image = _generate_4D_image(events, metadata)
         image.header.set_xyzt_units(t=8, xyz=2)
 
         nib.save(image, filepath)
@@ -242,6 +225,27 @@ def create_dummy_file(
 
     else:
         filepath.touch()
+
+
+def _get_nb_slices(metadata):
+    if metadata and "SliceTiming" in metadata:
+        return len(metadata["SliceTiming"])
+    else:
+        return None
+
+
+def _generate_4D_image(events, metadata):
+    max_time_secs = max(events["onset"]) + max(events["duration"]) if events else 10
+    tr = (
+        metadata["RepetitionTime"] if metadata and "RepetitionTime" in metadata else None
+    )
+    nb_vol = int(max_time_secs / tr) if tr else None
+
+    image = _img_4d_rand_eye(nb_slices=_get_nb_slices(metadata), nb_vol=nb_vol)
+    if tr:
+        image = set_tr(image, tr)
+
+    return image
 
 
 def create_sidecar(
