@@ -12,7 +12,7 @@ pip install .
 ## Usage
 
 ```python
-from pathfile import Path
+from pathlib import Path
 from fids.fids import create_fake_bids_dataset
 
 subjects = ["foo", 2, "01"]
